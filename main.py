@@ -23,7 +23,7 @@ CLOCK = 2
 
 def main():
     # 1. Load Config
-    config = {"tz_offset": 0, "zip_code": "30328"}
+    config = {"tz_offset": 0, "zip_code": "30328", "sensor_name": "cyd-monitor"}
     print("Loading config.json...")
     try:
         with open('config.json', 'r') as f:
@@ -35,7 +35,8 @@ def main():
     
     tz_offset = config['tz_offset']
     location = config['zip_code']
-    print(f"Active Zip Code: {location}")
+    sensor_name = config['sensor_name']
+    print(f"Active Zip Code: {location}, Sensor Name: {sensor_name}")
     i_url, i_org, i_bucket, i_token = config.get('influx_url'), config.get('influx_org'), config.get('influx_bucket'), config.get('influx_token')
 
     # 2. Init Hardware
@@ -137,7 +138,7 @@ def main():
                     try:
                         url = f"{i_url}/api/v2/write?org={i_org}&bucket={i_bucket}&precision=s"
                         headers = {"Authorization": f"Token {i_token}"}
-                        p = f"env,loc={location} co2={co2},temp={temp_f},humi={humi},lux={lux}"
+                        p = f"env,device={sensor_name},loc={location} co2={co2},temp={temp_f},humi={humi},lux={lux}"
                         r = urequests.post(url, data=p, headers=headers)
                         r.close()
                     except Exception as e:

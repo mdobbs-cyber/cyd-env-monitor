@@ -6,5 +6,6 @@
     "influx_url": "YOUR_INFLUXDB_URL",
     "influx_org": "YOUR_ORG_NAME",
     "influx_bucket": "YOUR_BUCKET_NAME",
-    "influx_token": "YOUR_ACCESS_TOKEN"
+    "influx_token": "YOUR_ACCESS_TOKEN",
+    "sensor_name": "cyd-monitor"
 }
