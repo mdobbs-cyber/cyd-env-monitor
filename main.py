@@ -23,7 +23,7 @@ CLOCK = 2
 
 def main():
     # 1. Load Config
-    config = {"tz_offset": 0, "zip_code": "30328", "sensor_name": "cyd-monitor"}
+    config = {"tz_offset": 0, "city": "Atlanta", "sensor_name": "cyd-monitor"}
     print("Loading config.json...")
     try:
         with open('config.json', 'r') as f:
@@ -34,9 +34,9 @@ def main():
         print("Using defaults:", config)
     
     tz_offset = config['tz_offset']
-    location = config['zip_code']
+    location = config['city']
     sensor_name = config['sensor_name']
-    print(f"Active Zip Code: {location}, Sensor Name: {sensor_name}")
+    print(f"Active City: {location}, Sensor Name: {sensor_name}")
     i_url, i_org, i_bucket, i_token = config.get('influx_url'), config.get('influx_org'), config.get('influx_bucket'), config.get('influx_token')
 
     # 2. Init Hardware
@@ -76,9 +76,11 @@ def main():
 
     def get_weather():
         import gc
+        gc.collect() # Maximize RAM before fetch
         try:
-            # Use JSON format for detailed data (current, high, low)
-            res = urequests.get(f"http://wttr.in/{location}?format=j1")
+            # ?0 returns only the current day's forecast, reducing payload
+            loc_query = location.replace(" ", "+")
+            res = urequests.get(f"http://wttr.in/{loc_query}?0&format=j1")
             data = res.json()
             res.close()
             
@@ -145,8 +147,8 @@ def main():
                         print("InfluxDB error:", e)
             except: pass
 
-        # Update Weather (15 min)
-        if now - last_weather_read >= 900 or last_weather_read == 0:
+        # Update Weather (30 min)
+        if now - last_weather_read >= 1800 or last_weather_read == 0:
             weather_str = get_weather()
             last_weather_read = now
             state_changed = True

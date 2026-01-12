@@ -36,7 +36,7 @@ Flash your ESP32 with the latest MicroPython firmware from [micropython.org](htt
     "ssid": "YOUR_WIFI_SSID",
     "password": "YOUR_WIFI_PASSWORD",
     "tz_offset": -5,
-    "zip_code": "30328",
+    "city": "Atlanta",
     "sensor_name": "living-room",
     "influx_url": "...",
     "influx_org": "...",
