@@ -1,0 +1,10 @@
+{
+    "ssid": "YOUR_WIFI_SSID",
+    "password": "YOUR_WIFI_PASSWORD",
+    "tz_offset": 0,
+    "zip_code": "YOUR_ZIP_CODE",
+    "influx_url": "YOUR_INFLUXDB_URL",
+    "influx_org": "YOUR_ORG_NAME",
+    "influx_bucket": "YOUR_BUCKET_NAME",
+    "influx_token": "YOUR_ACCESS_TOKEN"
+}

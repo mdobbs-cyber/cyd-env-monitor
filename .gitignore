@@ -1,0 +1,8 @@
+# MicroPython / IDE files
+__pycache__/
+*.pyc
+.pye
+.thonny/
+*.swp
+.DS_Store
+config.json
