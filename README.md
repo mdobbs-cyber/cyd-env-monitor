@@ -1,83 +1,69 @@
 # ESP32 CYD Environmental Monitor (SCD40)
 
-This project displays real-time CO2, Temperature, and Humidity readings from an SCD40 sensor on an ESP32-2432S028 (Cheap Yellow Display).
+Real-time air quality monitoring for the ESP32-2432S028 (Cheap Yellow Display). This project features a touch-responsive UI, historical sparklines, and live weather data integration.
+
+![Dashboard View](https://via.placeholder.com/320x240?text=Dashboard+View) <!-- Replace with actual screenshot if available -->
 
 ## Features
-- WiFi connection for NTP time sync.
-- Real-time sensor data reading.
-- Burn-in protection (jittering text/screen clearing).
-- MicroPython based.
+- **Triple-View UI**: Cycle between Dashboard, Graphs, and Big Clock views via touch.
+- **Sensors**: CO2, Temperature, Humidity (SCD40) and Ambient Light (LDR).
+- **Historical Data**: Real-time sparklines for CO2 and Temperature (1-hour history).
+- **Live Weather**: Integrated weather data from `wttr.in` based on your zip code.
+- **MicroPython Powered**: High performance with easy customization.
+- **Burn-in Protection**: Dynamic UI jittering to protect the LCD.
+- **Data Logging**: Optional integration with InfluxDB/Grafana.
 
-## Hardware Wiring
-| Component | ESP32 Pin |
-|-----------|-----------|
-| SCD40 SCL | IO22      |
-| SCD40 SDA | IO27      |
-| SCD40 VCC | 3.3V / 5V |
-| SCD40 GND | GND       |
+## Hardware Requirement
+- **ESP32-2432S028**: Also known as the "Cheap Yellow Display" (CYD).
+- **Sensata SCD40/SCD41**: High-accuracy CO2, temperature, and humidity sensor.
+- **Wiring (I2C)**:
+    - SCL: IO22
+    - SDA: IO27
+    - VCC: 3.3V / 5V
+    - GND: GND
 
-## Installation Guide
+## Installation
 
 ### 1. Flash MicroPython
-1. Download the latest MicroPython firmware for ESP32 from [micropython.org](https://micropython.org/download/esp32/).
-2. Use `esptool.py` to flash the firmware:
-   ```bash
-   esptool.py --chip esp32 --port /dev/ttyUSB0 erase_flash
-   esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 460800 write_flash -z 0x1000 esp32-xxxx.bin
-   ```
+Flash your ESP32 with the latest MicroPython firmware from [micropython.org](https://micropython.org/download/esp32/).
 
-### 2. Configure WiFi
-Create a file named `config.json` on the device (or edit the local one) with your credentials:
+### 2. Configure Your Device
+1. Rename `config.json.example` to `config.json`.
+2. Fill in your WiFi, Zip Code (for weather), and optional InfluxDB credentials.
+
 ```json
 {
     "ssid": "YOUR_WIFI_SSID",
-    "password": "YOUR_WIFI_PASSWORD"
+    "password": "YOUR_WIFI_PASSWORD",
+    "tz_offset": -5,
+    "zip_code": "30328",
+    "influx_url": "...",
+    "influx_org": "...",
+    "influx_bucket": "...",
+    "influx_token": "..."
 }
 ```
 
 ### 3. Upload Files
-Upload the following files to your ESP32:
+Upload the following to the root of your ESP32:
 - `boot.py`
 - `main.py`
 - `scd4x.py`
 - `ili9341.py`
+- `xpt2046.py` (Touch driver)
 - `font.py`
 - `config.json`
 
-Recommended command using `mpremote`:
-```bash
-mpremote cp boot.py main.py scd4x.py ili9341.py font.py config.json :
-```
+Recommended tool: `mpremote cp * :`
 
-### 4. Run
-Restart the board. It will connect to WiFi, sync time, and begin displaying sensor data.
+## Navigation
+Tapping anywhere on the screen cycles through the interactive views:
+1. **Dashboard**: Current metrics + sparklines.
+2. **Graphs**: Full-screen history for CO2 and Temperature.
+3. **Big Clock**: Large digital clock with weather forecast.
 
-## Grafana Cloud Integration (Optional)
+## Data Logging (Optional)
+If InfluxDB credentials are provided in `config.json`, the device will push sensor data every 60 seconds. This is compatible with InfluxDB v2 and Grafana Cloud's InfluxDB endpoint.
 
-The app can push metrics every minute using the InfluxDB Line Protocol. If the credentials are missing from `config.json`, this feature is disabled.
-
-### 1. Get Credentials
-1. Log in to [Grafana Cloud](https://grafana.com/products/cloud/).
-2. Go to **Cloud Portal** -> **InfluxDB** (or **Prometheus** -> **InfluxDB compatible endpoint**).
-3. Copy the **URL** (it should look like `https://influx-prod-xx.../api/v1/push/influx/write`).
-4. Note your **Username/User ID** (numeric).
-5. Generate an **API Token** with `MetricsPublisher` or `write` permissions.
-
-### 2. Update config.json
-Fill in the values in your local `config.json`:
-```json
-{
-    "grafana_url": "...",
-    "grafana_user": "...",
-    "grafana_token": "..."
-}
-```
-
-### 3. Verify
-Check the serial output for `Grafana push status: 204`. Use the **Explore** view in Grafana with the InfluxDB data source to see your metrics (`co2`, `temp_f`, `humidity`, `light`).
-
-## Note on Burn-in Protection
-The app jitters the display contents and periodically clears the screen to prevent static image retention on the LCD.
-
-## Note on VOC
-The SCD40 measures CO2. VOC readings would require an additional sensor like the SGP40.
+## License
+MIT
