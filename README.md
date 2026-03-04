@@ -8,7 +8,7 @@ Real-time air quality monitoring for the ESP32-2432S028 (Cheap Yellow Display). 
 - **Triple-View UI**: Cycle between Dashboard, Graphs, and Big Clock views via touch.
 - **Sensors**: CO2, Temperature, Humidity (SCD40) and Ambient Light (LDR).
 - **Historical Data**: Real-time sparklines for CO2 and Temperature (1-hour history).
-- **Live Weather**: Integrated weather data from `wttr.in` based on your zip code.
+- **Live Weather**: Integrated weather data from Open-Meteo based on your zip code.
 - **MicroPython Powered**: High performance with easy customization.
 - **Burn-in Protection**: Dynamic UI jittering to protect the LCD.
 - **Data Logging**: Optional integration with InfluxDB/Grafana.

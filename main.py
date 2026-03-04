@@ -78,19 +78,38 @@ def main():
         import gc
         gc.collect() # Maximize RAM before fetch
         try:
-            # ?0 returns only the current day's forecast, reducing payload
-            loc_query = location.replace(" ", "+")
-            res = urequests.get(f"http://wttr.in/{loc_query}?0&format=j1")
+            lat = config.get("lat")
+            lon = config.get("lon")
+            if lat is None or lon is None:
+                loc_query = location.replace(" ", "+")
+                url_geo = f"http://geocoding-api.open-meteo.com/v1/search?name={loc_query}&count=1&format=json"
+                r_geo = urequests.get(url_geo)
+                geo_data = r_geo.json()
+                r_geo.close()
+                if not geo_data.get("results"):
+                    return "Geo Error"
+                lat = geo_data["results"][0]["latitude"]
+                lon = geo_data["results"][0]["longitude"]
+                config["lat"] = lat
+                config["lon"] = lon
+                del geo_data
+                gc.collect()
+
+            url = f"http://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto&forecast_days=1"
+            res = urequests.get(url)
             data = res.json()
             res.close()
             
-            curr = data['current_condition'][0]
-            today = data['weather'][0]
+            curr = data['current']
+            daily = data['daily']
             
-            cond = curr['weatherDesc'][0]['value']
-            temp = curr['temp_F']
-            high = today['maxtempF']
-            low = today['mintempF']
+            code = curr['weather_code']
+            wmo = {0:"Clear", 1:"Clear", 2:"Cloudy", 3:"Overcast", 45:"Fog", 48:"Fog", 51:"Drizzle", 53:"Drizzle", 55:"Drizzle", 61:"Rain", 63:"Rain", 65:"Rain", 71:"Snow", 73:"Snow", 75:"Snow", 95:"Storm"}
+            cond = wmo.get(code, "Unknown")
+            
+            temp = int(curr['temperature_2m'])
+            high = int(daily['temperature_2m_max'][0])
+            low = int(daily['temperature_2m_min'][0])
             
             # Clean up memory
             del data
@@ -99,7 +118,7 @@ def main():
             return f"{cond} {temp}F H:{high} L:{low}"
         except Exception as e:
             print("Weather error:", e)
-            return "Weather Unavailable"
+            return "Weather Error"
 
     def draw_sparkline(data, x, y, w, h, color):
         if not data: return
