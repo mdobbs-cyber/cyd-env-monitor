@@ -7,5 +7,8 @@
     "influx_org": "YOUR_ORG_NAME",
     "influx_bucket": "YOUR_BUCKET_NAME",
     "influx_token": "YOUR_ACCESS_TOKEN",
-    "sensor_name": "cyd-monitor"
+    "sensor_name": "cyd-monitor",
+    "use_dst": true,
+    "auto_scroll": true,
+    "scroll_interval": 30
 }
